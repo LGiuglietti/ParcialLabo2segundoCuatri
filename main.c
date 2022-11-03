@@ -27,12 +27,12 @@ typedef struct nodoListaLibro
     struct nodoListaLibro* sig;
 } nodoListaLibro;
 //proto
-int altaArreglo(celda Arreglo[],nodoArbol*arbol,int validosArreglo);
+int altaArreglo(celda Arreglo[],nodoArbol*arbol,int i);
 nodoListaLibro*crearNodoLista(int Puntaje, int cantPaginas, char nombreLibro[],char genero[]);
 nodoListaLibro*insertarNodoEnLista(nodoListaLibro*lista, int Puntaje, int cantPaginas, char nombreLibro[],char genero[]);
 int buscarPosEnArreglo(celda Arreglo[],char nombreABuscar[], int posicion);
 int contarNodosArbol(nodoArbol*arbol, int validosArbol);
-int pasarDeArbolToArreglo(nodoArbol*arbol, celda Arreglo[],int validosArbol,int i,int posicion, int validosArreglo);
+int pasarDeArbolToArreglo(nodoArbol*arbol, celda Arreglo[],int validosArbol,int i,int posicion);
 ///--------------
 nodoArbol*crearNodoArbol(int Puntaje,int cantPaginas, char nombreLibro[],char genero[], char NombrePersona[]);
 nodoArbol*insertarNodoToArbol(nodoArbol*arbol,nodoArbol*nn);
@@ -195,32 +195,33 @@ int contarNodosArbol(nodoArbol*arbol, int validosArbol)
 }
 
 
-int pasarDeArbolToArreglo(nodoArbol*arbol, celda Arreglo[],int validosArbol,int i,int posicion, int validosArreglo)
+int pasarDeArbolToArreglo(nodoArbol*arbol, celda Arreglo[],int validosArbol,int i,int posicion)
 {
-    if(arbol!=NULL && i<validosArbol)
+    if(arbol!=NULL && i<5)//5 es dimension de arreglo
     {
-        posicion=buscarPosEnArreglo(Arreglo,arbol->NombrePersona,posicion);
+        posicion=buscarPosEnArreglo(Arreglo,arbol->NombrePersona,posicion); //busca posicion o devuelve -1
 
         if(posicion==-1)
         {
-            validosArreglo=altaArreglo(Arreglo,arbol,validosArreglo);
-            posicion=validosArreglo-1;
+            i=altaArreglo(Arreglo,arbol,i); //si es -1 carga esa celda del arreglo con los datos
+            posicion=i-1; //como i se adelanto uno debido a que agregamos una celda restamos uno a la posicion, para rellenar la lista
         }
+        //ingresamos nodo en lista con datos del nodo de arbol
         Arreglo[posicion].listaLibros=insertarNodoEnLista(Arreglo[posicion].listaLibros,arbol->Puntaje,arbol->cantPaginas,arbol->nombreLibro,arbol->genero);
-        i++;
-        i=pasarDeArbolToArreglo(arbol->izq,Arreglo,validosArbol,i,posicion,validosArreglo);
-        i=pasarDeArbolToArreglo(arbol->der,Arreglo,validosArbol,i,posicion,validosArreglo);
+        //recursion recorriendo por izquierda y luego derecha del arbol
+        i=pasarDeArbolToArreglo(arbol->izq,Arreglo,validosArbol,i,posicion);
+        i=pasarDeArbolToArreglo(arbol->der,Arreglo,validosArbol,i,posicion);
     }
     return i;
 }
 
 
-int altaArreglo(celda Arreglo[],nodoArbol*arbol,int validosArreglo)
+int altaArreglo(celda Arreglo[],nodoArbol*arbol,int i)
 {
-    strcpy(Arreglo[validosArreglo].NombrePersona,arbol->NombrePersona);
-    Arreglo[validosArreglo].listaLibros=NULL;
-    validosArreglo++;
-    return validosArreglo;
+    strcpy(Arreglo[i].NombrePersona,arbol->NombrePersona);
+    Arreglo[i].listaLibros=NULL;
+    i++;
+    return i;
 }
 
 
